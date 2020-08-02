@@ -1,8 +1,5 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,7 +8,11 @@ public class Menu {
     private LinkedHashMap<String, ButtonMethod> buttonMethodMap = new LinkedHashMap<>();
     private Difficulty selectedDifficulty;
     private Mode mode;
-    private int[] gameSize = new int[] {2, 2};
+    private int[] gameSize = new int[]{2, 2};
+
+    public static void main(String[] args) {
+        new Menu(1000, 700);
+    }
 
     public Menu(int width, int height) {
         this.size = new int[]{width, height};
@@ -42,7 +43,7 @@ public class Menu {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Difficulty:", SwingConstants.LEFT));
 
-        for (Difficulty difficulty: Difficulty.values()){
+        for (Difficulty difficulty : Difficulty.values()) {
             JRadioButton btn = new JRadioButton(difficulty.getName());
             btn.addActionListener(actionEvent -> setSelectedDifficulty(difficulty));
             panel.add(btn);
@@ -56,7 +57,7 @@ public class Menu {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Select your opponent:", SwingConstants.LEFT));
 
-        for (Mode mode: Mode.values()){
+        for (Mode mode : Mode.values()) {
             JRadioButton btn = new JRadioButton(mode.getName());
             btn.addActionListener(actionEvent -> setMode(mode));
             panel.add(btn);
@@ -86,7 +87,7 @@ public class Menu {
     public JPanel createButtonPanel() {
         JPanel panel = new JPanel();
 
-        for (Map.Entry<String, ButtonMethod> entry: buttonMethodMap.entrySet()){
+        for (Map.Entry<String, ButtonMethod> entry : buttonMethodMap.entrySet()) {
             JButton btn = new JButton(entry.getKey());
             btn.addActionListener(actionEvent -> entry.getValue().execute());
             panel.add(btn);
@@ -98,11 +99,7 @@ public class Menu {
         return size;
     }
 
-    public static void main(String[] args) {
-        new Menu(1000, 700);
-    }
-
-    private void fillButtonMethodMap(){
+    private void fillButtonMethodMap() {
         buttonMethodMap.put("Change Theme", this::changeTheme);
         buttonMethodMap.put("High Scores", this::showHighScores);
         buttonMethodMap.put("Rules", this::showRules);
@@ -118,22 +115,24 @@ public class Menu {
         this.mode = mode;
     }
 
-    private void changeTheme(){
+    private void changeTheme() {
         System.out.println("should change theme");
     }
 
     public void setGameSize(int rows, int cols) {
-        gameSize = new int[] {rows, cols};
+        gameSize = new int[]{rows, cols};
     }
 
-    private void showHighScores(){
-        System.out.println("should show high scores");
+    private void showHighScores() {
+        new HighScore();
     }
-    private void showRules(){
-        System.out.println("should show rules");
+
+    private void showRules() {
+        new Rules();
     }
-    private void startGame(){
-        if (gameSize[0] * gameSize[1] % 2 != 0){
+
+    private void startGame() {
+        if (gameSize[0] * gameSize[1] % 2 != 0) {
             System.out.println("invalid game size");
             return;
         }
