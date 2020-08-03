@@ -1,41 +1,25 @@
 import javax.swing.*;
+import java.awt.*;
 
-public class Card extends JButton{
-    private ImageIcon background;
+public class Card extends JButton {
     private ImageIcon photo;
-    private Boolean isVisible;
     private int ID;
 
-    Card(ImageIcon photo, ImageIcon back, int id){
-        super(back);
-        background = back;
+    Card(ImageIcon photo, int id) {
+        this.setBackground(Color.PINK);
         this.photo = photo;
-        this.isVisible = false;
         this.ID = id;
     }
 
-    public void turnCard(){
-        isVisible = !isVisible;
-        this.setIcon(getCardIcon());
+    public void turnCard() {
+        this.setIcon(this.getIcon() == null ? getCardIcon() : null);
     }
 
-    public ImageIcon getCardIcon(){
+    public ImageIcon getCardIcon() {
         return photo;
     }
 
-    public boolean isVisible(){
-        return isVisible;
-    }
-
-    public void setIsVisible(boolean bool){
-        isVisible = bool;
-    }
-
-    public void setCardIcon(ImageIcon icon){
-        photo = icon;
-    }
-
-    public int getID(){
+    public int getID() {
         return ID;
     }
 }

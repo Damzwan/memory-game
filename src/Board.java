@@ -36,7 +36,7 @@ class Board {
             Image pic = ImageIO.read(getClass().getResource("Images/" + i + ".png"));
             ImageIcon icon = new ImageIcon(pic);
 
-            Card card1 = new Card(icon, back, i);
+            Card card1 = new Card(icon, i);
             card1.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -46,7 +46,7 @@ class Board {
             card1.setForeground(Color.BLUE);
             cards.add(card1);
 
-            Card card2 = new Card(icon, back, i);
+            Card card2 = new Card(icon, i);
             card2.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
