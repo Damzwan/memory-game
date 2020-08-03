@@ -16,10 +16,19 @@ public class Card extends JButton{
 
     public void turnCard(){
         isVisible = !isVisible;
+        this.setIcon(getCardIcon());
     }
 
     public ImageIcon getCardIcon(){
         return photo;
+    }
+
+    public boolean isVisible(){
+        return isVisible;
+    }
+
+    public void setIsVisible(boolean bool){
+        isVisible = bool;
     }
 
     public void setCardIcon(ImageIcon icon){
