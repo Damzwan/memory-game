@@ -62,38 +62,29 @@ public class Game {
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void cardClicked(ActionEvent e) {
 
-
-        //If this is the exit button we quit the game
-//        if (((JButton) e.getSource()).getText() == "Exit the game"){
-//            memoryLayout.dispose();
-//            return;
-//        }
-
-        if(timerrunning) return;
-
+        if (timerrunning) return;
         Card card = (Card) e.getSource();
-        if (card.getIcon() == null) {
-            card.turnCard();
-            tocompare.add(card);
-            if (tocompare.size() == 2) {
-                int delay = 500;
-                Timer timer = new Timer( delay, ex -> {
-                    isMatch(tocompare.get(0), tocompare.get(1));
-                    timerrunning = false;
+        if (card.getIcon() != null) return;
 
-                } );
-                timer.setRepeats( false );//make sure the timer only runs once
-                timerrunning = true;
-                timer.start();
-            }
-        }
+        card.turnCard();
+        tocompare.add(card);
+        if (tocompare.size() != 2) return;
 
-        if (isFinished()) {
+        int delay = 500;
+        Timer timer = new Timer(delay, ex -> {
+            isMatch(tocompare.get(0), tocompare.get(1));
+            timerrunning = false;
+
+            if (!isFinished()) return;
             new GameOver(scorePlayer1, scorePlayer2);
             window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-        }
+        });
+
+        timer.setRepeats(false);//make sure the timer only runs once
+        timerrunning = true;
+        timer.start();
     }
 
     private void isMatch(Card card1, Card card2) {
@@ -107,7 +98,7 @@ public class Game {
             card1.turnCard();
             card2.turnCard();
             isPlayer1 = !isPlayer1;
-            playerTurn.setText(isPlayer1? "Player 1's Turn" : "Player 2's Turn");
+            playerTurn.setText(isPlayer1 ? "Player 1's Turn" : "Player 2's Turn");
             System.out.println("no Match");
         }
         tocompare.clear();

@@ -1,12 +1,9 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-
 
 
 class Board {
@@ -16,7 +13,7 @@ class Board {
     private ArrayList<Card> cards;
     private Game game;
 
-    public Board(int[] dim, String theme, Game game){
+    public Board(int[] dim, String theme, Game game) {
         this.dimension = dim;
         this.theme = theme;
         this.game = game;
@@ -30,35 +27,29 @@ class Board {
 
     private ArrayList<Card> generateCards(int[] dim) throws IOException {
         ArrayList<Card> cards = new ArrayList<>();
-        int dif_cards = (dim[0] * dim[1])/2 - 1;
-        Image bomb = ImageIO.read(getClass().getResource("Images/" + "bomb" + ".png"));
-        ImageIcon iconbomb = new ImageIcon(bomb);
+        int dif_cards = (dim[0] * dim[1]) / 2 - 1;
+
+        //TODO wtf is this
+//        Image bomb = ImageIO.read(getClass().getResource("Images/" + "bomb" + ".png"));
+//        ImageIcon iconbomb = new ImageIcon(bomb);
 
 
-        for(int i = 0; i < dif_cards; i++) {
-            System.out.println(i);
+        for (int i = 0; i <= dif_cards; i++) {
             Image pic = ImageIO.read(getClass().getResource("Images/" + i + ".png"));
             ImageIcon icon = new ImageIcon(pic);
-
-            Card card1 = createCard(icon, i);
-            cards.add(card1);
-            cards.add(card1);
+            cards.add(createCard(icon, i));
+            cards.add(createCard(icon, i));
         }
         return cards;
     }
 
-    private Card createCard(ImageIcon icon, int i){
+    private Card createCard(ImageIcon icon, int i) {
         Card card = new Card(icon, i);
-        card.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                game.actionPerformed(e);
-            }
-        });
+        card.addActionListener(e -> game.cardClicked(e));
         return card;
     }
 
-    public ArrayList<Card> getCards(){
+    public ArrayList<Card> getCards() {
         return cards;
     }
 }
