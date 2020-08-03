@@ -75,9 +75,11 @@ public class Game{
 //        }
 
         Card card = (Card) e.getSource();
-        card.setIcon(card.getCardIcon());
-        tocompare.add(card);
-        System.out.println(tocompare.size());
+        if(!card.isVisible()) {
+            card.turnCard();
+            tocompare.add(card);
+            System.out.println(tocompare.size());
+        }
 
         if(tocompare.size() == 2) {
             System.out.println("compare pls");
@@ -106,7 +108,9 @@ public class Game{
         }
         else {
             card1.setIcon(null);
+            card1.setIsVisible(false);
             card2.setIcon(null);
+            card2.setIsVisible(false);
             isPlayer1 = !isPlayer1;
             System.out.println("no Match");
         }
