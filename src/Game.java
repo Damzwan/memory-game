@@ -1,12 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class Game {
     int[] dim;
     String theme = "Some Theme";
+    private JFrame window;
     private ArrayList<Card> tocompare = new ArrayList<>();
     private Mode mode;
     private Difficulty difficulty;
@@ -29,12 +31,12 @@ public class Game {
         this.difficulty = difficulty;
         this.cards = board.getCards();
 
-        JFrame f = new JFrame("Game");
-        f.setSize(width, height);
+        this.window = new JFrame("Game");
+        window.setSize(width, height);
         JPanel mainPanel = new JPanel();
         addButtons(mainPanel);
         mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
-        f.add(mainPanel);
+        window.add(mainPanel);
 
 
         JPanel scorePanel = new JPanel();
@@ -47,9 +49,9 @@ public class Game {
         scorePanel.add(scorePlayer1Label);
         scorePanel.add(scorePlayer2Label);
         scorePanel.add(playerTurn);
-        f.add(scorePanel, BorderLayout.NORTH);
+        window.add(scorePanel, BorderLayout.NORTH);
 
-        f.setVisible(true);
+        window.setVisible(true);
 
 
     }
@@ -61,34 +63,19 @@ public class Game {
     }
 
     public void actionPerformed(ActionEvent e) {
-
-
-        //If this is the exit button we quit the game
-//        if (((JButton) e.getSource()).getText() == "Exit the game"){
-//            memoryLayout.dispose();
-//            return;
-//        }
-
         Card card = (Card) e.getSource();
         if (card.getIcon() == null) {
             card.turnCard();
             tocompare.add(card);
-            if (tocompare.size() == 2) isMatch(tocompare.get(0), tocompare.get(1));
-        }
-
-        if (isfinished()) {
-            System.out.println("game finished");
-            int highScore = scorePlayer2;
-            if (scorePlayer1 > scorePlayer2) {
-                System.out.println("Player 1 won!");
-                highScore = scorePlayer1;
-            } else if (scorePlayer1 < scorePlayer2) {
-                System.out.println("Player 2 won!");
-            } else {
-                System.out.println("It's a draw!");
+            if (tocompare.size() == 2) {
+                isMatch(tocompare.get(0), tocompare.get(1));
             }
         }
-        //If we have 2 images we start comparing them
+
+        if (isFinished()) {
+            new GameOver(scorePlayer1, scorePlayer2);
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+        }
     }
 
     private void isMatch(Card card1, Card card2) {
@@ -97,22 +84,17 @@ public class Game {
             else scorePlayer2 += 100;
             System.out.println("match");
         } else {
-            card1.setIcon(null);
-//            card1.setRip(false);
-            card2.setIcon(null);
-//            card2.setRip(false);
+            card1.turnCard();
+            card2.turnCard();
             isPlayer1 = !isPlayer1;
             System.out.println("no Match");
         }
         tocompare.clear();
     }
 
-    private boolean isfinished() {
-        for (Card card : cards) {
-            if (card.getIcon() == null) {
-                return false;
-            }
-        }
+    private boolean isFinished() {
+        for (Card card : cards)
+            if (card.getIcon() == null) return false;
         return true;
     }
 }

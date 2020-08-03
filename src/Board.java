@@ -32,29 +32,14 @@ class Board {
         ArrayList<Card> cards = new ArrayList<>();
         int dif_cards = (dim[0] * dim[1])/2;
         for(int i = 0; i < dif_cards; i++) {
-            System.out.println(i);
             Image pic = ImageIO.read(getClass().getResource("Images/" + i + ".png"));
             ImageIcon icon = new ImageIcon(pic);
 
-            Card card1 = new Card(icon, i);
-            card1.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    game.actionPerformed(e);
-                }
-            });
-            card1.setForeground(Color.BLUE);
-            cards.add(card1);
-
-            Card card2 = new Card(icon, i);
-            card2.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    game.actionPerformed(e);
-                }
-            });
-            card2.setForeground(Color.BLUE);
-            cards.add(card2);
+            for (int j = 0; j < 2; j++){
+                Card card = new Card(icon, i);
+                card.addActionListener(e -> game.actionPerformed(e));
+                cards.add(card);
+            }
         }
         return cards;
     }
