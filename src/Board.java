@@ -12,6 +12,8 @@ class Board {
     private String theme;
     private ArrayList<Card> cards;
     private Game game;
+    public int BombID = -1;
+    public   int shuffelID = -2;
 
     public Board(int[] dim, String theme, Game game) {
         this.dimension = dim;
@@ -27,11 +29,16 @@ class Board {
 
     private ArrayList<Card> generateCards(int[] dim) throws IOException {
         ArrayList<Card> cards = new ArrayList<>();
-        int dif_cards = (dim[0] * dim[1]) / 2 - 1;
+        int dif_cards = (dim[0] * dim[1]) / 2 - 2;
 
         //TODO wtf is this
-//        Image bomb = ImageIO.read(getClass().getResource("Images/" + "bomb" + ".png"));
-//        ImageIcon iconbomb = new ImageIcon(bomb);
+        Image bomb = ImageIO.read(getClass().getResource("Images/bomb.png"));
+        ImageIcon iconbomb = new ImageIcon(bomb);
+        cards.add(createCard(iconbomb, BombID));
+
+        Image shuffle = ImageIO.read(getClass().getResource("Images/Cards.png"));
+        ImageIcon iconShuffle = new ImageIcon(shuffle);
+        cards.add(createCard(iconShuffle, shuffelID));
 
 
         for (int i = 0; i <= dif_cards; i++) {

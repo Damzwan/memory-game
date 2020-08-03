@@ -3,12 +3,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 public class Game {
     int[] dim;
     String theme = "Some Theme";
     private JFrame window;
+    private JFrame postShuffleWindow;
     private ArrayList<Card> tocompare = new ArrayList<>();
     private Mode mode;
     private Difficulty difficulty;
@@ -22,6 +24,10 @@ public class Game {
     private boolean timerrunning = false;
     private static final Set<String> valid_difficulties = Set.of("Easy", "Medium", "Hard");
     private static final Set<String> valid_modes = Set.of("Easy", "Medium", "Hard");
+    private int width;
+    private int height;
+    private JPanel scorePanel = new JPanel();
+
 
     public Game(int[] dim, Mode mode, Difficulty difficulty, int width, int height) throws IllegalStateException {
         Board board = new Board(dim, theme, this);
@@ -30,7 +36,9 @@ public class Game {
         this.mode = mode;
         this.difficulty = difficulty;
         this.cards = board.getCards();
-
+        this.height = height;
+        this.width = width;
+        this.dim = dim;
         this.window = new JFrame("Game");
         window.setSize(width, height);
         JPanel mainPanel = new JPanel();
@@ -39,7 +47,6 @@ public class Game {
         window.add(mainPanel);
 
 
-        JPanel scorePanel = new JPanel();
         scorePlayer1Label = new JLabel();
         scorePlayer1Label.setText("Player P1: " + "000");
         scorePlayer2Label = new JLabel();
@@ -68,6 +75,33 @@ public class Game {
         Card card = (Card) e.getSource();
         if (card.getIcon() != null) return;
 
+        if(card.getID() == -1){
+            if(isPlayer1) scorePlayer1 -= 200;
+            else scorePlayer2 -= 200;
+            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
+            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
+            card.turnCard();
+            isFinished();
+            return;
+        }
+
+        if(card.getID() == -2){
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+            this.postShuffleWindow = new JFrame("Post-Shuffle");
+            postShuffleWindow.setSize(width, height);
+            JPanel mainPanel = new JPanel();
+            Collections.shuffle(cards);
+            addButtons(mainPanel);
+            mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
+            postShuffleWindow.add(mainPanel);
+            postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
+            postShuffleWindow.setVisible(true);
+            card.turnCard();
+            isFinished();
+            return;
+        }
+
+
         card.turnCard();
         tocompare.add(card);
         if (tocompare.size() != 2) return;
@@ -76,10 +110,6 @@ public class Game {
         Timer timer = new Timer(delay, ex -> {
             isMatch(tocompare.get(0), tocompare.get(1));
             timerrunning = false;
-
-            if (!isFinished()) return;
-            new GameOver(scorePlayer1, scorePlayer2);
-            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         });
 
         timer.setRepeats(false);//make sure the timer only runs once
@@ -107,6 +137,9 @@ public class Game {
     private boolean isFinished() {
         for (Card card : cards)
             if (card.getIcon() == null) return false;
+        new GameOver(scorePlayer1, scorePlayer2);
+        window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+        postShuffleWindow.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         return true;
     }
 }
