@@ -74,33 +74,7 @@ public class Game {
         if (timerrunning) return;
         Card card = (Card) e.getSource();
         if (card.getIcon() != null) return;
-
-        if(card.getID() == -1){
-            if(isPlayer1) scorePlayer1 -= 200;
-            else scorePlayer2 -= 200;
-            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
-            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
-            card.turnCard();
-            isFinished();
-            return;
-        }
-
-        if(card.getID() == -2){
-            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-            this.postShuffleWindow = new JFrame("Post-Shuffle");
-            postShuffleWindow.setSize(width, height);
-            JPanel mainPanel = new JPanel();
-            Collections.shuffle(cards);
-            addButtons(mainPanel);
-            mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
-            postShuffleWindow.add(mainPanel);
-            postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
-            postShuffleWindow.setVisible(true);
-            card.turnCard();
-            isFinished();
-            return;
-        }
-
+        if(isSpecialCard(card)) return;
 
         card.turnCard();
         tocompare.add(card);
@@ -124,6 +98,7 @@ public class Game {
             System.out.println("match");
             scorePlayer1Label.setText("Player P1: " + scorePlayer1);
             scorePlayer2Label.setText("Player P2: " + scorePlayer2);
+            isFinished();
         } else {
             card1.turnCard();
             card2.turnCard();
@@ -134,13 +109,41 @@ public class Game {
         tocompare.clear();
     }
 
-    private boolean isFinished() {
+    private void isFinished() {
         for (Card card : cards)
-            if (card.getIcon() == null) return false;
+            if (card.getIcon() == null) return;
         new GameOver(scorePlayer1, scorePlayer2);
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         postShuffleWindow.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-        return true;
+    }
+
+    private boolean isSpecialCard(Card card){
+        if(card.getID() == -1){
+            if(isPlayer1) scorePlayer1 -= 200;
+            else scorePlayer2 -= 200;
+            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
+            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
+            card.turnCard();
+            isFinished();
+            return true;
+        }
+
+        if(card.getID() == -2){
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+            this.postShuffleWindow = new JFrame("Post-Shuffle");
+            postShuffleWindow.setSize(width, height);
+            JPanel mainPanel = new JPanel();
+            Collections.shuffle(cards);
+            addButtons(mainPanel);
+            mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
+            postShuffleWindow.add(mainPanel);
+            postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
+            postShuffleWindow.setVisible(true);
+            card.turnCard();
+            isFinished();
+            return true;
+        }
+        return false;
     }
 }
 
