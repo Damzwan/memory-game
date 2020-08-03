@@ -14,6 +14,7 @@ public class Menu {
         new Menu(1000, 700);
     }
 
+
     public Menu(int width, int height) {
         this.size = new int[]{width, height};
         JFrame f = new JFrame("Memory Game");
@@ -137,6 +138,7 @@ public class Menu {
             return;
         }
         System.out.println("should start game");
+        Game game = new Game(gameSize, mode, selectedDifficulty, size[0], size[1]);
     }
 
     interface ButtonMethod {
