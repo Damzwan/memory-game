@@ -19,7 +19,7 @@ public class Game {
     private JLabel scorePlayer1Label;
     private JLabel scorePlayer2Label;
     private JLabel playerTurn;
-
+    private boolean timerrunning = false;
     private static final Set<String> valid_difficulties = Set.of("Easy", "Medium", "Hard");
     private static final Set<String> valid_modes = Set.of("Easy", "Medium", "Hard");
 
@@ -63,12 +63,30 @@ public class Game {
     }
 
     public void actionPerformed(ActionEvent e) {
+
+
+        //If this is the exit button we quit the game
+//        if (((JButton) e.getSource()).getText() == "Exit the game"){
+//            memoryLayout.dispose();
+//            return;
+//        }
+
+        if(timerrunning) return;
+
         Card card = (Card) e.getSource();
         if (card.getIcon() == null) {
             card.turnCard();
             tocompare.add(card);
             if (tocompare.size() == 2) {
-                isMatch(tocompare.get(0), tocompare.get(1));
+                int delay = 500;
+                Timer timer = new Timer( delay, ex -> {
+                    isMatch(tocompare.get(0), tocompare.get(1));
+                    timerrunning = false;
+
+                } );
+                timer.setRepeats( false );//make sure the timer only runs once
+                timerrunning = true;
+                timer.start();
             }
         }
 
@@ -83,10 +101,13 @@ public class Game {
             if (isPlayer1) scorePlayer1 += 100;
             else scorePlayer2 += 100;
             System.out.println("match");
+            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
+            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
         } else {
             card1.turnCard();
             card2.turnCard();
             isPlayer1 = !isPlayer1;
+            playerTurn.setText(isPlayer1? "Player 1's Turn" : "Player 2's Turn");
             System.out.println("no Match");
         }
         tocompare.clear();
