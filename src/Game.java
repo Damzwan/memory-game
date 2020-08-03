@@ -17,7 +17,7 @@ public class Game {
     private JLabel scorePlayer1Label;
     private JLabel scorePlayer2Label;
     private JLabel playerTurn;
-
+    private boolean timerrunning = false;
     private static final Set<String> valid_difficulties = Set.of("Easy", "Medium", "Hard");
     private static final Set<String> valid_modes = Set.of("Easy", "Medium", "Hard");
 
@@ -48,10 +48,7 @@ public class Game {
         scorePanel.add(scorePlayer2Label);
         scorePanel.add(playerTurn);
         f.add(scorePanel, BorderLayout.NORTH);
-
         f.setVisible(true);
-
-
     }
 
     private void addButtons(JPanel panel) {
@@ -69,11 +66,23 @@ public class Game {
 //            return;
 //        }
 
+        if(timerrunning) return;
+
         Card card = (Card) e.getSource();
         if (card.getIcon() == null) {
             card.turnCard();
             tocompare.add(card);
-            if (tocompare.size() == 2) isMatch(tocompare.get(0), tocompare.get(1));
+            if (tocompare.size() == 2) {
+                int delay = 500;
+                Timer timer = new Timer( delay, ex -> {
+                    isMatch(tocompare.get(0), tocompare.get(1));
+                    timerrunning = false;
+
+                } );
+                timer.setRepeats( false );//make sure the timer only runs once
+                timerrunning = true;
+                timer.start();
+            }
         }
 
         if (isfinished()) {
@@ -96,12 +105,13 @@ public class Game {
             if (isPlayer1) scorePlayer1 += 100;
             else scorePlayer2 += 100;
             System.out.println("match");
+            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
+            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
         } else {
             card1.setIcon(null);
-//            card1.setRip(false);
             card2.setIcon(null);
-//            card2.setRip(false);
             isPlayer1 = !isPlayer1;
+            playerTurn.setText(isPlayer1? "Player 1's Turn" : "Player 2's Turn");
             System.out.println("no Match");
         }
         tocompare.clear();
