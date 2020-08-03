@@ -43,10 +43,12 @@ public class Menu {
     public JPanel createDifficultyPanel() {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Difficulty:", SwingConstants.LEFT));
+        ButtonGroup grp = new ButtonGroup();
 
         for (Difficulty difficulty : Difficulty.values()) {
             JRadioButton btn = new JRadioButton(difficulty.getName());
             btn.addActionListener(actionEvent -> setSelectedDifficulty(difficulty));
+            grp.add(btn);
             panel.add(btn);
         }
 
@@ -57,10 +59,12 @@ public class Menu {
     public JPanel createModePanel() {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Select your opponent:", SwingConstants.LEFT));
+        ButtonGroup grp = new ButtonGroup();
 
         for (Mode mode : Mode.values()) {
             JRadioButton btn = new JRadioButton(mode.getName());
             btn.addActionListener(actionEvent -> setMode(mode));
+            grp.add(btn);
             panel.add(btn);
         }
 
