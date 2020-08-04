@@ -31,7 +31,7 @@ public class Menu {
         mainPanel.add(createThemePanel());
         mainPanel.add(createSizePanel());
         mainPanel.add(createButtonPanel());
-        mainPanel.setLayout(new GridLayout(5, 1));
+        mainPanel.setLayout(new GridLayout(6, 1));
         f.add(mainPanel);
         f.setVisible(true);
     }
