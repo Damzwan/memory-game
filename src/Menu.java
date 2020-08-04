@@ -8,10 +8,13 @@ public class Menu {
     private LinkedHashMap<String, ButtonMethod> buttonMethodMap = new LinkedHashMap<>();
     private Difficulty selectedDifficulty;
     private Mode mode;
+    private Theme theme;
     private int[] gameSize = new int[]{2, 2};
+    private static int height = 700;
+    private static int width = 1000;
 
     public static void main(String[] args) {
-        new Menu(1000, 700);
+        new Menu(width, height);
     }
 
 
@@ -25,6 +28,7 @@ public class Menu {
         mainPanel.add(createTitlePanel());
         mainPanel.add(createDifficultyPanel());
         mainPanel.add(createModePanel());
+        mainPanel.add(createThemePanel());
         mainPanel.add(createSizePanel());
         mainPanel.add(createButtonPanel());
         mainPanel.setLayout(new GridLayout(5, 1));
@@ -34,6 +38,7 @@ public class Menu {
 
     public JPanel createTitlePanel() {
         JPanel panel = new JPanel();
+        panel.setSize(width, height/6);
         JLabel title = new JLabel("Epic Memory Game", SwingConstants.CENTER);
         title.setFont(new Font("Serif", Font.BOLD, getSize()[0] / 20));
         panel.add(title);
@@ -42,6 +47,7 @@ public class Menu {
 
     public JPanel createDifficultyPanel() {
         JPanel panel = new JPanel();
+        panel.setSize(width, height/7);
         panel.add(new JLabel("Difficulty:", SwingConstants.LEFT));
         ButtonGroup grp = new ButtonGroup();
 
@@ -55,9 +61,25 @@ public class Menu {
         return panel;
     }
 
+    public JPanel createThemePanel(){
+        JPanel panel = new JPanel();
+        panel.setSize(width, height/7);
+        panel.add(new JLabel("Select your theme:", SwingConstants.LEFT));
+        ButtonGroup grp = new ButtonGroup();
+
+        for (Theme theme : Theme.values()) {
+            JRadioButton btn = new JRadioButton(theme.getName());
+            btn.addActionListener(actionEvent -> setTheme(theme));
+            grp.add(btn);
+            panel.add(btn);
+        }
+        return panel;
+    }
+
     //TODO perhaps merge with difficulty panel
     public JPanel createModePanel() {
         JPanel panel = new JPanel();
+        panel.setSize(width, height/7);
         panel.add(new JLabel("Select your opponent:", SwingConstants.LEFT));
         ButtonGroup grp = new ButtonGroup();
 
@@ -73,6 +95,7 @@ public class Menu {
 
     public JPanel createSizePanel() {
         JPanel panel = new JPanel();
+        panel.setSize(width, height/7);
         SpinnerModel rowValue = new SpinnerNumberModel(2, 1, 4, 1);
         SpinnerModel colValue = new SpinnerNumberModel(2, 1, 4, 1);
 
@@ -91,6 +114,7 @@ public class Menu {
 
     public JPanel createButtonPanel() {
         JPanel panel = new JPanel();
+        panel.setSize(width, height/7);
 
         for (Map.Entry<String, ButtonMethod> entry : buttonMethodMap.entrySet()) {
             JButton btn = new JButton(entry.getKey());
@@ -105,7 +129,6 @@ public class Menu {
     }
 
     private void fillButtonMethodMap() {
-        buttonMethodMap.put("Change Theme", this::changeTheme);
         buttonMethodMap.put("High Scores", this::showHighScores);
         buttonMethodMap.put("Rules", this::showRules);
         buttonMethodMap.put("Start", this::startGame);
@@ -118,6 +141,10 @@ public class Menu {
 
     private void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    private void setTheme(Theme theme){
+        this.theme = theme;
     }
 
     private void changeTheme() {

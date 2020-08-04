@@ -31,7 +31,6 @@ class Board {
         ArrayList<Card> cards = new ArrayList<>();
         int dif_cards = (dim[0] * dim[1]) / 2 - 2;
 
-        //TODO wtf is this
         Image bomb = ImageIO.read(getClass().getResource("Images/bomb.png"));
         ImageIcon iconbomb = new ImageIcon(resizeImage(bomb));
         cards.add(createCard(iconbomb, BombID));
@@ -62,7 +61,7 @@ class Board {
         return card;
     }
 
-    public ArrayList<Card> getCards() {
+    ArrayList<Card> getCards() {
         return cards;
     }
 }
