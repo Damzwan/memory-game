@@ -8,10 +8,13 @@ public class Menu {
     private LinkedHashMap<String, ButtonMethod> buttonMethodMap = new LinkedHashMap<>();
     private Difficulty selectedDifficulty;
     private Mode mode;
+    private Theme theme;
     private int[] gameSize = new int[]{2, 2};
+    private static int height = 700;
+    private static int width = 1000;
 
     public static void main(String[] args) {
-        new Menu(1000, 700);
+        new Menu(width, height);
     }
 
 
@@ -28,9 +31,10 @@ public class Menu {
         mainPanel.add(createTitlePanel());
         mainPanel.add(createDifficultyPanel());
         mainPanel.add(createModePanel());
+        mainPanel.add(createThemePanel());
         mainPanel.add(createSizePanel());
         mainPanel.add(createButtonPanel());
-        mainPanel.setLayout(new GridLayout(5, 1));
+        mainPanel.setLayout(new GridLayout(6, 1));
         f.add(mainPanel);
         f.setVisible(true);
     }
@@ -54,6 +58,21 @@ public class Menu {
             grp.add(btn);
             panel.add(btn);
             if (difficulty == Difficulty.EASY) btn.setSelected(true);
+        }
+        return panel;
+    }
+
+    public JPanel createThemePanel(){
+        JPanel panel = new JPanel();
+        panel.setSize(width, height/7);
+        panel.add(new JLabel("Select your theme:", SwingConstants.LEFT));
+        ButtonGroup grp = new ButtonGroup();
+
+        for (Theme theme : Theme.values()) {
+            JRadioButton btn = new JRadioButton(theme.getName());
+            btn.addActionListener(actionEvent -> setTheme(theme));
+            grp.add(btn);
+            panel.add(btn);
         }
         return panel;
     }
@@ -111,7 +130,6 @@ public class Menu {
     }
 
     private void fillButtonMethodMap() {
-        buttonMethodMap.put("Change Theme", this::changeTheme);
         buttonMethodMap.put("High Scores", this::showHighScores);
         buttonMethodMap.put("Rules", this::showRules);
         buttonMethodMap.put("Start", this::startGame);
@@ -124,6 +142,10 @@ public class Menu {
 
     private void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    private void setTheme(Theme theme){
+        this.theme = theme;
     }
 
     private void changeTheme() {
@@ -148,7 +170,6 @@ public class Menu {
             return;
         }
         System.out.println("should start game");
-        System.out.println(selectedDifficulty);
         new Game(gameSize, mode, selectedDifficulty, size[0], size[1]);
     }
 

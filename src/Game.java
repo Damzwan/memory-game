@@ -22,15 +22,16 @@ public class Game {
     private boolean timerrunning = false;
     private static final Set<String> valid_difficulties = Set.of("Easy", "Medium", "Hard");
     private static final Set<String> valid_modes = Set.of("Easy", "Medium", "Hard");
-    private int width;
-    private int height;
+    public static int windowWidth = 1000;
+    public static int windowHeight = 700;
+    public static int scorePanelHeight = 24;
     private JPanel scorePanel = new JPanel();
     private int bombDamage = -200;
     private HashMap<Integer, Card> computerMemory = new HashMap<>();
     private HashMap<Difficulty, Double> chanceMap = new HashMap<>();
 
 
-    Game(int[] dim, Mode mode, Difficulty difficulty, int width, int height) throws IllegalStateException {
+    Game(int[] dim, Mode mode, Difficulty difficulty) throws IllegalStateException {
         Board board = new Board(dim, theme, this);
 //        if(!(valid_difficulties.contains(difficulty)))throw new IllegalArgumentException("invalid difficulty");
 //        if(!(valid_modes.contains(mode))) throw new IllegalStateException("This is an Illegal mode");
@@ -38,15 +39,14 @@ public class Game {
         this.mode = mode;
         this.difficulty = difficulty;
         this.cards = board.getCards();
-        this.height = height;
-        this.width = width;
         this.dim = dim;
 
         this.window = new JFrame("Game");
-        window.setSize(width, height);
+        window.setSize(windowWidth, windowHeight);
         window.add(createCardPanel());
         window.add(createScorePanel(), BorderLayout.NORTH);
         window.setVisible(true);
+        System.out.print(scorePanel.getHeight());
     }
 
     private JPanel createCardPanel() {
@@ -66,11 +66,13 @@ public class Game {
         scorePanel.add(scorePlayer1Label);
         scorePanel.add(scorePlayer2Label);
         scorePanel.add(playerTurn);
+        scorePanel.setSize(windowWidth, scorePanelHeight);
         return scorePanel;
     }
 
     private void addCardsToPanel(JPanel panel) {
         for (Card card : cards) {
+
             panel.add(card);
         }
     }
@@ -190,7 +192,7 @@ public class Game {
         computerMemory = new HashMap<>(); //reset the memory of the computer
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING)); //Close the previous window
         this.postShuffleWindow = new JFrame("Post-Shuffle");
-        postShuffleWindow.setSize(width, height);
+        postShuffleWindow.setSize(windowWidth, windowHeight);
         JPanel mainPanel = new JPanel();
         Collections.shuffle(cards);
         addCardsToPanel(mainPanel);
