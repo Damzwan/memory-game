@@ -27,9 +27,10 @@ public class Game {
     private int width;
     private int height;
     private JPanel scorePanel = new JPanel();
+    private int bombDamage = -200;
 
 
-    public Game(int[] dim, Mode mode, Difficulty difficulty, int width, int height) throws IllegalStateException {
+    Game(int[] dim, Mode mode, Difficulty difficulty, int width, int height) throws IllegalStateException {
         Board board = new Board(dim, theme, this);
 //        if(!(valid_difficulties.contains(difficulty)))throw new IllegalArgumentException("invalid difficulty");
 //        if(!(valid_modes.contains(mode))) throw new IllegalStateException("This is an Illegal mode");
@@ -74,37 +75,19 @@ public class Game {
         }
     }
 
-    public void cardClicked(ActionEvent e) {
+    void cardClicked(ActionEvent e) {
 
         if (timerrunning) return;
         Card card = (Card) e.getSource();
         if (card.getIcon() != null) return;
-
-        if (card.getID() == -1) {
-            updateScore(-200);
-            card.turnCard();
-            isFinished();
-            return;
-        }
-
-        if (card.getID() == -2) {
-            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-            this.postShuffleWindow = new JFrame("Post-Shuffle");
-            postShuffleWindow.setSize(width, height);
-            JPanel mainPanel = new JPanel();
-            Collections.shuffle(cards);
-            addCardsToPanel(mainPanel);
-            mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
-            postShuffleWindow.add(mainPanel);
-            postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
-            postShuffleWindow.setVisible(true);
-            card.turnCard();
-            isFinished();
-            return;
-        }
-
-
         card.turnCard();
+
+        if (isSpecialCard(card)){
+            isFinished();
+            return;
+        }
+
+
         cardsToCompare.add(card);
         if (cardsToCompare.size() != 2) return;
 
@@ -119,8 +102,13 @@ public class Game {
         timer.start();
     }
 
+
+
     private void isMatch(Card card1, Card card2) {
-        if (card1.getID() == card2.getID()) updateScore(100);
+        if (card1.getID() == card2.getID()){
+            updateScore(100);
+            isFinished();
+        }
         else endTurn(card1, card2);
         cardsToCompare.clear();
     }
@@ -139,13 +127,42 @@ public class Game {
         playerTurn.setText(isPlayer1 ? "Player 1's Turn" : "Player 2's Turn");
     }
 
-    private boolean isFinished() {
+    private void isFinished() {
         for (Card card : cards)
-            if (card.getIcon() == null) return false;
+            if (card.getIcon() == null) return;
+        endGame();
+    }
+
+    private void endGame(){
         new GameOver(scorePlayer1, scorePlayer2);
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         postShuffleWindow.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-        return true;
+    }
+
+    private boolean isSpecialCard(Card card){
+        if (card.getID() == Board.BombID) {
+            updateScore(bombDamage);
+            return true;
+        }
+
+        if (card.getID() == Board.shuffelID) {
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
+            createPostShuffleWindow();
+            return true;
+        }
+        return false;
+    }
+
+    private void createPostShuffleWindow(){
+        this.postShuffleWindow = new JFrame("Post-Shuffle");
+        postShuffleWindow.setSize(width, height);
+        JPanel mainPanel = new JPanel();
+        Collections.shuffle(cards);
+        addCardsToPanel(mainPanel);
+        mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
+        postShuffleWindow.add(mainPanel);
+        postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
+        postShuffleWindow.setVisible(true);
     }
 }
 

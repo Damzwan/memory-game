@@ -12,8 +12,8 @@ class Board {
     private String theme;
     private ArrayList<Card> cards;
     private Game game;
-    public int BombID = -1;
-    public   int shuffelID = -2;
+    public static int BombID = -1;
+    public static int shuffelID = -2;
 
     public Board(int[] dim, String theme, Game game) {
         this.dimension = dim;
