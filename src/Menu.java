@@ -17,6 +17,9 @@ public class Menu {
 
     public Menu(int width, int height) {
         this.size = new int[]{width, height};
+        setSelectedDifficulty(Difficulty.EASY);
+        setMode(Mode.COMPUTER);
+
         JFrame f = new JFrame("Memory Game");
         f.setSize(width, height);
         JPanel mainPanel = new JPanel();
@@ -50,8 +53,8 @@ public class Menu {
             btn.addActionListener(actionEvent -> setSelectedDifficulty(difficulty));
             grp.add(btn);
             panel.add(btn);
+            if (difficulty == Difficulty.EASY) btn.setSelected(true);
         }
-
         return panel;
     }
 
@@ -66,6 +69,7 @@ public class Menu {
             btn.addActionListener(actionEvent -> setMode(mode));
             grp.add(btn);
             panel.add(btn);
+            if (mode == Mode.COMPUTER) btn.setSelected(true);
         }
 
         return panel;
@@ -73,8 +77,8 @@ public class Menu {
 
     public JPanel createSizePanel() {
         JPanel panel = new JPanel();
-        SpinnerModel rowValue = new SpinnerNumberModel(2, 1, 4, 1);
-        SpinnerModel colValue = new SpinnerNumberModel(2, 1, 4, 1);
+        SpinnerModel rowValue = new SpinnerNumberModel(3, 1, 4, 1);
+        SpinnerModel colValue = new SpinnerNumberModel(4, 1, 4, 1);
 
         //TODO code duplication
         panel.add(new JLabel("Rows:", SwingConstants.LEFT));
@@ -85,6 +89,8 @@ public class Menu {
         panel.add(new JLabel("Cols:", SwingConstants.LEFT));
         JSpinner colSpinner = new JSpinner(colValue);
         colSpinner.addChangeListener(changeEvent -> setGameSize(gameSize[0], (Integer) colSpinner.getValue()));
+        setGameSize((Integer) rowSpinner.getValue(), (Integer) colSpinner.getValue());
+
         panel.add(colSpinner);
         return panel;
     }
@@ -142,7 +148,8 @@ public class Menu {
             return;
         }
         System.out.println("should start game");
-        Game game = new Game(gameSize, mode, selectedDifficulty, size[0], size[1]);
+        System.out.println(selectedDifficulty);
+        new Game(gameSize, mode, selectedDifficulty, size[0], size[1]);
     }
 
     interface ButtonMethod {
