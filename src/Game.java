@@ -11,7 +11,7 @@ public class Game {
     String theme = "Some Theme";
     private JFrame window;
     private JFrame postShuffleWindow;
-    private ArrayList<Card> tocompare = new ArrayList<>();
+    private ArrayList<Card> cardsToCompare = new ArrayList<>();
     private Mode mode;
     private Difficulty difficulty;
     private int scorePlayer1;
@@ -39,14 +39,23 @@ public class Game {
         this.height = height;
         this.width = width;
         this.dim = dim;
+
+
         this.window = new JFrame("Game");
         window.setSize(width, height);
-        JPanel mainPanel = new JPanel();
-        addButtons(mainPanel);
-        mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
-        window.add(mainPanel);
+        window.add(createCardPanel());
+        window.add(createScorePanel(), BorderLayout.NORTH);
+        window.setVisible(true);
+    }
 
+    private JPanel createCardPanel() {
+        JPanel cardPanel = new JPanel();
+        addCardsToPanel(cardPanel);
+        cardPanel.setLayout(new GridLayout(dim[0], dim[1]));
+        return cardPanel;
+    }
 
+    private JPanel createScorePanel() {
         scorePlayer1Label = new JLabel();
         scorePlayer1Label.setText("Player P1: " + "000");
         scorePlayer2Label = new JLabel();
@@ -56,14 +65,10 @@ public class Game {
         scorePanel.add(scorePlayer1Label);
         scorePanel.add(scorePlayer2Label);
         scorePanel.add(playerTurn);
-        window.add(scorePanel, BorderLayout.NORTH);
-
-        window.setVisible(true);
-
-
+        return scorePanel;
     }
 
-    private void addButtons(JPanel panel) {
+    private void addCardsToPanel(JPanel panel) {
         for (Card card : cards) {
             panel.add(card);
         }
@@ -75,23 +80,20 @@ public class Game {
         Card card = (Card) e.getSource();
         if (card.getIcon() != null) return;
 
-        if(card.getID() == -1){
-            if(isPlayer1) scorePlayer1 -= 200;
-            else scorePlayer2 -= 200;
-            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
-            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
+        if (card.getID() == -1) {
+            updateScore(-200);
             card.turnCard();
             isFinished();
             return;
         }
 
-        if(card.getID() == -2){
+        if (card.getID() == -2) {
             window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
             this.postShuffleWindow = new JFrame("Post-Shuffle");
             postShuffleWindow.setSize(width, height);
             JPanel mainPanel = new JPanel();
             Collections.shuffle(cards);
-            addButtons(mainPanel);
+            addCardsToPanel(mainPanel);
             mainPanel.setLayout(new GridLayout(dim[0], dim[1]));
             postShuffleWindow.add(mainPanel);
             postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
@@ -103,12 +105,12 @@ public class Game {
 
 
         card.turnCard();
-        tocompare.add(card);
-        if (tocompare.size() != 2) return;
+        cardsToCompare.add(card);
+        if (cardsToCompare.size() != 2) return;
 
         int delay = 500;
         Timer timer = new Timer(delay, ex -> {
-            isMatch(tocompare.get(0), tocompare.get(1));
+            isMatch(cardsToCompare.get(0), cardsToCompare.get(1));
             timerrunning = false;
         });
 
@@ -118,20 +120,23 @@ public class Game {
     }
 
     private void isMatch(Card card1, Card card2) {
-        if (card1.getID() == card2.getID()) {
-            if (isPlayer1) scorePlayer1 += 100;
-            else scorePlayer2 += 100;
-            System.out.println("match");
-            scorePlayer1Label.setText("Player P1: " + scorePlayer1);
-            scorePlayer2Label.setText("Player P2: " + scorePlayer2);
-        } else {
-            card1.turnCard();
-            card2.turnCard();
-            isPlayer1 = !isPlayer1;
-            playerTurn.setText(isPlayer1 ? "Player 1's Turn" : "Player 2's Turn");
-            System.out.println("no Match");
-        }
-        tocompare.clear();
+        if (card1.getID() == card2.getID()) updateScore(100);
+        else endTurn(card1, card2);
+        cardsToCompare.clear();
+    }
+
+    private void updateScore(int amount) {
+        if (isPlayer1) scorePlayer1 += amount;
+        else scorePlayer2 += amount;
+        scorePlayer1Label.setText("Player P1: " + scorePlayer1);
+        scorePlayer2Label.setText("Player P2: " + scorePlayer2);
+    }
+
+    private void endTurn(Card card1, Card card2) {
+        card1.turnCard();
+        card2.turnCard();
+        isPlayer1 = !isPlayer1;
+        playerTurn.setText(isPlayer1 ? "Player 1's Turn" : "Player 2's Turn");
     }
 
     private boolean isFinished() {
