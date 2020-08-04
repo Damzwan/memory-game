@@ -77,9 +77,8 @@ public class Game {
 
     void cardClicked(ActionEvent e) {
 
-        if (timerrunning) return;
         Card card = (Card) e.getSource();
-        if (card.getIcon() != null) return;
+        if (timerrunning || card.getIcon() != null) return;
         card.turnCard();
 
         int delay = 500;
