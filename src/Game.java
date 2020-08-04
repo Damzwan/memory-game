@@ -77,9 +77,8 @@ public class Game {
 
     void cardClicked(ActionEvent e) {
 
-        if (timerrunning) return;
         Card card = (Card) e.getSource();
-        if (card.getIcon() != null) return;
+        if (timerrunning || card.getIcon() != null) return;
         card.turnCard();
 
         if (isSpecialCard(card)){
@@ -101,8 +100,6 @@ public class Game {
         timerrunning = true;
         timer.start();
     }
-
-
 
     private void isMatch(Card card1, Card card2) {
         if (card1.getID() == card2.getID()){
