@@ -82,18 +82,16 @@ public class Game {
         if (card.getIcon() != null) return;
         card.turnCard();
 
-        if (isSpecialCard(card)){
-            isFinished();
-            return;
-        }
-
-
-        cardsToCompare.add(card);
-        if (cardsToCompare.size() != 2) return;
-
         int delay = 500;
         Timer timer = new Timer(delay, ex -> {
-            isMatch(cardsToCompare.get(0), cardsToCompare.get(1));
+            if (card.getID() == Board.BombID) updateScore(bombDamage);
+            else if (card.getID() == Board.shuffelID) createPostShuffleWindow();
+            else {
+                cardsToCompare.add(card);
+                if (cardsToCompare.size() == 2) isMatch(cardsToCompare.get(0), cardsToCompare.get(1));
+            }
+
+            if (isFinished()) endGame();
             timerrunning = false;
         });
 
@@ -102,14 +100,11 @@ public class Game {
         timer.start();
     }
 
-
-
     private void isMatch(Card card1, Card card2) {
-        if (card1.getID() == card2.getID()){
+        if (card1.getID() == card2.getID()) {
             updateScore(100);
             isFinished();
-        }
-        else endTurn(card1, card2);
+        } else endTurn(card1, card2);
         cardsToCompare.clear();
     }
 
@@ -127,33 +122,20 @@ public class Game {
         playerTurn.setText(isPlayer1 ? "Player 1's Turn" : "Player 2's Turn");
     }
 
-    private void isFinished() {
+    private boolean isFinished() {
         for (Card card : cards)
-            if (card.getIcon() == null) return;
-        endGame();
+            if (card.getIcon() == null) return false;
+        return true;
     }
 
-    private void endGame(){
+    private void endGame() {
         new GameOver(scorePlayer1, scorePlayer2);
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         postShuffleWindow.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
     }
 
-    private boolean isSpecialCard(Card card){
-        if (card.getID() == Board.BombID) {
-            updateScore(bombDamage);
-            return true;
-        }
-
-        if (card.getID() == Board.shuffelID) {
-            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
-            createPostShuffleWindow();
-            return true;
-        }
-        return false;
-    }
-
-    private void createPostShuffleWindow(){
+    private void createPostShuffleWindow() {
+        window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING)); //Close the previous window
         this.postShuffleWindow = new JFrame("Post-Shuffle");
         postShuffleWindow.setSize(width, height);
         JPanel mainPanel = new JPanel();

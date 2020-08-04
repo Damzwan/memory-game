@@ -46,6 +46,8 @@ public class HighScore {
 
     public String createHighScoreString(ArrayList<Person> persons) {
         persons.sort(Comparator.comparingInt(Person::getScore));
+        Collections.reverse(persons); //TODO can be better
+
         StringBuilder highScoreString = new StringBuilder("Highscores \n ------------------------------------------------------------------------------------");
         for (Person person : persons)
             highScoreString.append("\n").append(person.getName()).append(": ").append(person.getScore());
