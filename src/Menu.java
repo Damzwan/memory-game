@@ -170,7 +170,7 @@ public class Menu {
             return;
         }
         System.out.println("should start game");
-        new Game(gameSize, mode, selectedDifficulty, size[0], size[1]);
+        new Game(gameSize, mode, selectedDifficulty);
     }
 
     interface ButtonMethod {

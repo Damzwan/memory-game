@@ -13,7 +13,7 @@ class Board {
     private ArrayList<Card> cards;
     private Game game;
     public static int BombID = -1;
-    public static int shuffelID = -2;
+    public static int shuffleId = -2;
 
     public Board(int[] dim, String theme, Game game) {
         this.dimension = dim;
@@ -37,7 +37,7 @@ class Board {
 
         Image shuffle = ImageIO.read(getClass().getResource("Images/Cards.png"));
         ImageIcon iconShuffle = new ImageIcon(resizeImage(shuffle));
-        cards.add(createCard(iconShuffle, shuffelID));
+        cards.add(createCard(iconShuffle, shuffleId));
 
 
         for (int i = 0; i <= dif_cards; i++) {
