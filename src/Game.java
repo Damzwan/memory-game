@@ -28,6 +28,9 @@ class Game {
     public static int scorePanelHeight = 24;
     private JPanel scorePanel;
     private int bombDamage = -200;
+
+    //The memory of the computer. As soon as a card is drawn the computer will remember that this card has been drawn by remembering its id.
+    // When the computer draws a card it will check whether it has the id of this card stored in its memory. If this is the case it will turn this card instead of a random one
     private HashMap<Integer, Card> computerMemory = new HashMap<>();
     private HashMap<Difficulty, Double> chanceMap = new HashMap<>();
 
@@ -87,10 +90,12 @@ class Game {
 
     void turnCard(Card card) {
 
-        computerMemory.putIfAbsent(card.getID(), card);
-        if ((timerrunning && isPlayer1) || card.getIcon() != null) return;
+        computerMemory.putIfAbsent(card.getID(), card); //save the turned card into the memory of the computer
+        if ((timerrunning && isPlayer1) || card.getIcon() != null)
+            return; //check whether we are eligible to turn a card
         card.turnCard();
 
+        // We execute a card action instantly if no cards have been turned yet in a turn. After that we wait a small amount so that the player can see whether the second card is a match
         if (cardsToCompare.size() == 1) {
             int delay = 500;
             Timer timer = new Timer(delay, ex -> {
@@ -103,7 +108,7 @@ class Game {
         } else actionHandler(card);
     }
 
-
+    //Check what action should be executed depending on the id of the card
     private void actionHandler(Card card) {
         if (card.getID() == Board.BombID) updateScore(bombDamage);
         else if (card.getID() == Board.shuffleId) createPostShuffleWindow();
@@ -114,25 +119,34 @@ class Game {
         if (isFinished()) endGame();
     }
 
-    private void computerAction() {
+    //The computer must draw 2 non-special cards in total. This function is responsible for drawing the first card
+    // If a special card is turned this function should start again
+    private void computerTurnFirstNormalCard() {
         Card card = getRandomCard();
         turnCard(card);
 
+        //The turned card is special, we will restart this function after a small delay
         if (card.getID() == Board.BombID || card.getID() == Board.shuffleId) {
-            Timer newTimer = new Timer(500, ex2 -> computerAction());
+            Timer newTimer = new Timer(500, ex2 -> computerTurnFirstNormalCard()); //wait a small amount before starting again
             newTimer.setRepeats(false);//make sure the timer only runs once
             newTimer.start();
             return;
         }
 
+        //The turned card is a normal one, wait a bit
         Timer timer = new Timer(1000, ex -> {
+            //The computer does not know where the other card is, it will turn a random one again
             if (computerMemory.get(card.getID()) == null || (computerMemory.get(card.getID()) == card))
-                secondComputerAction();
+                computerTurnSecondNormalCard();
             else {
+                //The computer knows where the other card is
                 Random random = new Random();
                 double r = random.nextDouble();
+
+                //Depending on the selected difficulty the computer has a chance that it will ignore the fact that it knows the matching card
+                //When put on easy the computer has a 66% chance of ignoring this. 33% on Medium and 0% on Hard
                 if (r < chanceMap.get(difficulty)) turnCard(computerMemory.get(card.getID()));
-                else secondComputerAction(); //TODO merge with first if?
+                else computerTurnSecondNormalCard(); //TODO merge with first if?
             }
         });
 
@@ -140,20 +154,26 @@ class Game {
         timer.start();
     }
 
-    private void secondComputerAction() {
+    //The computer must draw 2 non-special cards in total. This function is responsible for drawing the second card
+    // If a special card is turned this function should start again
+    private void computerTurnSecondNormalCard() {
         Card card = getRandomCard();
         turnCard(card);
+
+        //The turned card is special, we will restart this function after a small delay
         if (card.getID() == Board.BombID || card.getID() == Board.shuffleId) {
-            Timer timer = new Timer(1000, ex -> secondComputerAction());
+            Timer timer = new Timer(1000, ex -> computerTurnSecondNormalCard());
             timer.setRepeats(false);//make sure the timer only runs once
             timer.start();
         }
     }
 
+    //Get a random non-turned card out of the cards array list
     private Card getRandomCard() {
         Random randomGenerator = new Random();
         int index = randomGenerator.nextInt(cards.size());
-        while (cards.get(index).getIcon() != null) index = randomGenerator.nextInt(cards.size());
+        while (cards.get(index).getIcon() != null)
+            index = randomGenerator.nextInt(cards.size()); //keep choosing a random card until we find a card that has not been turned yet
         return cards.get(index);
     }
 
@@ -161,7 +181,7 @@ class Game {
         cardsToCompare.clear();
         if (card1.getID() == card2.getID()) {
             updateScore(100);
-            if (!isPlayer1 && !isFinished()) computerAction();
+            if (!isPlayer1 && !isFinished()) computerTurnFirstNormalCard();
         } else endTurn(card1, card2);
     }
 
@@ -176,7 +196,7 @@ class Game {
         card1.turnCard();
         card2.turnCard();
         switchPlayer();
-        if (!isPlayer1 && this.mode == Mode.COMPUTER) computerAction();
+        if (!isPlayer1 && this.mode == Mode.COMPUTER) computerTurnFirstNormalCard();
     }
 
     private void switchPlayer() {

@@ -44,9 +44,10 @@ public class HighScore {
         f.setVisible(true);
     }
 
+    //create a string based on the collected highscores
     public String createHighScoreString(ArrayList<Person> persons) {
-        persons.sort(Comparator.comparingInt(Person::getScore));
-        Collections.reverse(persons); //TODO can be better
+        persons.sort(Comparator.comparingInt(Person::getScore)); //sort the array of persons based on the score --> lowest score first
+        Collections.reverse(persons); //reverse the array, we should start with the highest score first
 
         StringBuilder highScoreString = new StringBuilder("Highscores \n ------------------------------------------------------------------------------------");
         for (Person person : persons)
@@ -54,18 +55,21 @@ public class HighScore {
         return highScoreString.toString();
     }
 
+    //read the highscores from the highscores text file
     private ArrayList<Person> getScores() {
-        ArrayList<Person> persons = new ArrayList<>();
+        ArrayList<Person> persons = new ArrayList<>(); //An array of perons containing the name and score of each person
 
         try {
-            File myObj = new File("highscores.txt");
-            Scanner myReader = new Scanner(myObj);
+            File myObj = new File("highscores.txt"); //find the file
+            Scanner myReader = new Scanner(myObj); //create a reader
+
+            //as long as a line is available in the text file we add a person to the persons array
             while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                int splitterIndex = data.indexOf("-");
+                String data = myReader.nextLine(); //a string containing the name and score of a person
+                int splitterIndex = data.indexOf("-"); //find where the name ends and where the score starts
                 persons.add(new Person(data.substring(0, splitterIndex), parseInt((data.substring(splitterIndex + 1)))));
             }
-            myReader.close();
+            myReader.close(); //close the reader
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
