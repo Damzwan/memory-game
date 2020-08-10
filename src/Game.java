@@ -4,9 +4,12 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.util.*;
 
-public class Game {
-    int[] dim;
-    String theme = "Some Theme";
+//This Class defines a Game, a game is created through the Menu and this is the essence of the project.
+//A game contains a difficulty, a mode, a theme and a Dimension. All of these are provided depending on what
+// chooses the user makes in the menu
+class Game {
+    private int[] dim;
+    private String theme = "Some Theme";
     private JFrame window;
     private JFrame postShuffleWindow;
     private ArrayList<Card> cardsToCompare = new ArrayList<>();
@@ -20,15 +23,16 @@ public class Game {
     private JLabel scorePlayer2Label;
     private JLabel playerTurn;
     private boolean timerrunning = false;
-    public static int windowWidth = 1000;
-    public static int windowHeight = 700;
+    static int windowWidth = 1000;
+    static int windowHeight = 700;
     public static int scorePanelHeight = 24;
-    private JPanel scorePanel = new JPanel();
+    private JPanel scorePanel;
     private int bombDamage = -200;
     private HashMap<Integer, Card> computerMemory = new HashMap<>();
     private HashMap<Difficulty, Double> chanceMap = new HashMap<>();
 
-
+    //the constructor uses the variables given by the menu and saves these in the global variables
+    //a new Jframe is made for the current game, this frame contains a scorepanel and a cardpanel
     Game(int[] dim, Mode mode, Difficulty difficulty) throws IllegalStateException {
         Board board = new Board(dim, theme, this);
 //        if(!(valid_difficulties.contains(difficulty)))throw new IllegalArgumentException("invalid difficulty");
@@ -39,14 +43,17 @@ public class Game {
         this.cards = board.getCards();
         this.dim = dim;
 
+        //a
         this.window = new JFrame("Game");
         window.setSize(windowWidth, windowHeight);
         window.add(createCardPanel());
         window.add(createScorePanel(), BorderLayout.NORTH);
         window.setVisible(true);
+        scorePanel = new JPanel();
         System.out.print(scorePanel.getHeight());
     }
 
+    //this method creeates a panel in which all cards are stored
     private JPanel createCardPanel() {
         JPanel cardPanel = new JPanel();
         addCardsToPanel(cardPanel);
@@ -54,6 +61,7 @@ public class Game {
         return cardPanel;
     }
 
+    //This method creates a scorePanel containing the scores of both players and who's turn it is.
     private JPanel createScorePanel() {
         scorePlayer1Label = new JLabel();
         scorePlayer1Label.setText("Player P1: " + "000");
@@ -68,14 +76,16 @@ public class Game {
         return scorePanel;
     }
 
+    //This method adds the cards of the game to the current panel, this is a helper method of the method createCardpanel
     private void addCardsToPanel(JPanel panel) {
         for (Card card : cards) {
-
             panel.add(card);
         }
     }
 
-    public void turnCard(Card card) {
+
+
+    void turnCard(Card card) {
 
         computerMemory.putIfAbsent(card.getID(), card);
         if ((timerrunning && isPlayer1) || card.getIcon() != null) return;
