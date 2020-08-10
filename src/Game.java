@@ -20,8 +20,6 @@ public class Game {
     private JLabel scorePlayer2Label;
     private JLabel playerTurn;
     private boolean timerrunning = false;
-    private static final Set<String> valid_difficulties = Set.of("Easy", "Medium", "Hard");
-    private static final Set<String> valid_modes = Set.of("Easy", "Medium", "Hard");
     public static int windowWidth = 1000;
     public static int windowHeight = 700;
     public static int scorePanelHeight = 24;
