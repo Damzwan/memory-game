@@ -5,27 +5,32 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/*
+ * The class GameOver is used to create the window after the game is finished and show the end scores.
+ */
 public class GameOver {
     private JFrame window;
 
     public GameOver(int score1, int score2) {
         this.window = new JFrame("Game Finished");
-        window.setSize(400, 400);
+        window.setSize(600, 400);
 
-        //create the textarea responsible for showing the highscores
+        //A panel is created in the frame using a text area to show the scores of the different player in the game.
         JPanel scorePanel = new JPanel();
-        JTextArea area = new JTextArea(createScoreString(score1, score2)); //create a highscore string and set the textarea value to this string
+        //With this text area a high score can be set which can be seen in the menu when pushing the High Score button
+        JTextArea area = new JTextArea(createScoreString(score1, score2));
         area.setFont(new Font("Serif", Font.PLAIN, 15));
         area.setBounds(10, 30, 380, 200);
         area.setEditable(false);
         scorePanel.add(area);
 
-        //create a save panel
+        //This panel gives the option create a save panel
         JPanel savePanel = new JPanel();
         savePanel.add(new JLabel("Enter Name: ", SwingConstants.LEFT));
         JTextArea name = new JTextArea("Yanan Bonte");
         JButton btn = new JButton("Save!");
-        btn.addActionListener(actionEvent -> saveHighScore(score1, score2, name.getText())); //when the button is pressed we should save the score
+        //Pressing the button sends an action to save the score
+        btn.addActionListener(actionEvent -> saveHighScore(score1, score2, name.getText()));
         savePanel.add(name);
         savePanel.add(btn);
 
@@ -43,15 +48,19 @@ public class GameOver {
         return winner + "\n ------------------------------------------------------------------------------------ \n Score Player1: " + score1 + "\n Score Player 2: " + score2;
     }
 
-    //write the highscore to the highscores file
+    //This method is executed when the Save button is clicked (action event).
+    //The name and score are used as input. 
     private void saveHighScore(int score1, int score2, String name) {
-        int highestScore = Math.max(score1, score2); //get the highest score
+    	//Retrieve the highest score of the two (the player with the lowest score cannot put his/her score into the file!
+        int highestScore = Math.max(score1, score2);
         try {
-            File file = new File("highscores.txt"); //get the file
-            FileWriter myWriter = new FileWriter(file, true); //create a filewriter, the second argument is used so that we append to a file instead of starting a new one
-            myWriter.write(name + "-" + highestScore + "\n"); //write the string
-            myWriter.close(); //close the writer
-            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING)); //close the window
+        	//Create the file and FileWriter. Also when the file already exists, append do not create a new one (second argument of the FileWriter)
+            File file = new File("highscores.txt"); 
+            FileWriter myWriter = new FileWriter(file, true);
+            myWriter.write(name + "-" + highestScore + "\n");
+            //Close the writer and window (so the high score cannot be added twice
+            myWriter.close();
+            window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();

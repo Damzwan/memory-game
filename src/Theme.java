@@ -1,6 +1,6 @@
 public enum Theme {
-    ANIMALS,
-    COFFEE;
+    CHRISTMAS,
+	ANIMALS;
 
     public String getName(){
         String lowerCase = this.toString().toLowerCase();

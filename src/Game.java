@@ -4,12 +4,12 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.util.*;
 
-//This Class defines a Game, a game is created through the Menu and this is the essence of the project.
-//A game contains a difficulty, a mode, a theme and a Dimension. All of these are provided depending on what
-// chooses the user makes in the menu
+/*This class defines a Game, created by the class Menu and also the essence of the project.
+ *A game has a difficulty, a mode (second player or computer), a theme (Christmas or animals) and a Dimension (rows and columns). 
+ *All of these depend on what the user chooses in the menu.
+ */
 class Game {
     private int[] dim;
-    private String theme = "Some Theme";
     private JFrame window;
     private JFrame postShuffleWindow;
     private ArrayList<Card> cardsToCompare = new ArrayList<>();
@@ -29,34 +29,34 @@ class Game {
     private JPanel scorePanel;
     private int bombDamage = -200;
 
-    //The memory of the computer. As soon as a card is drawn the computer will remember that this card has been drawn by remembering its id.
-    // When the computer draws a card it will check whether it has the id of this card stored in its memory. If this is the case it will turn this card instead of a random one
+    //Hashmap computerMemory contains the turned cards saved by the computer. As soon as a card is drawn the computer will remember that this card has been drawn by remembering its id.
+    //When the computer draws a card it will check whether it has the id of this card stored in its memory. If this is the case it will turn this card instead of a random one.
     private HashMap<Integer, Card> computerMemory = new HashMap<>();
+    //????
     private HashMap<Difficulty, Double> chanceMap = new HashMap<>();
 
-    //the constructor uses the variables given by the menu and saves these in the global variables
-    //a new Jframe is made for the current game, this frame contains a scorepanel and a cardpanel
-    Game(int[] dim, Mode mode, Difficulty difficulty) throws IllegalStateException {
+    /*Creating a new Game object, the constructor needs 3 variables. They are chosen in the Menu frame and saved as 
+     * the global variables. A new JFrame is made for each new game containing a score panel and card panel.
+     */
+    Game(int[] dim, Mode mode, Difficulty difficulty, Theme theme) throws IllegalStateException {
         Board board = new Board(dim, theme, this);
-//        if(!(valid_difficulties.contains(difficulty)))throw new IllegalArgumentException("invalid difficulty");
-//        if(!(valid_modes.contains(mode))) throw new IllegalStateException("This is an Illegal mode");
         fillChanceMap();
         this.mode = mode;
         this.difficulty = difficulty;
         this.cards = board.getCards();
         this.dim = dim;
 
-        //a
+        //A new default frame is created with two panels created by two different methods.
         this.window = new JFrame("Game");
         window.setSize(windowWidth, windowHeight);
         window.add(createCardPanel());
+        scorePanel = new JPanel();
         window.add(createScorePanel(), BorderLayout.NORTH);
         window.setVisible(true);
-        scorePanel = new JPanel();
         System.out.print(scorePanel.getHeight());
     }
 
-    //this method creeates a panel in which all cards are stored
+    //This method creates a new panel in which all cards are stored.
     private JPanel createCardPanel() {
         JPanel cardPanel = new JPanel();
         addCardsToPanel(cardPanel);
@@ -64,7 +64,7 @@ class Game {
         return cardPanel;
     }
 
-    //This method creates a scorePanel containing the scores of both players and who's turn it is.
+    //This method creates a new scorePanel containing the scores of both players and whose turn it is both using labels.
     private JPanel createScorePanel() {
         scorePlayer1Label = new JLabel();
         scorePlayer1Label.setText("Player P1: " + "000");
@@ -79,7 +79,7 @@ class Game {
         return scorePanel;
     }
 
-    //This method adds the cards of the game to the current panel, this is a helper method of the method createCardpanel
+    //The method adds the cards of the game to the current panel. It is a helper method of the method createCardpanel
     private void addCardsToPanel(JPanel panel) {
         for (Card card : cards) {
             panel.add(card);
@@ -87,28 +87,33 @@ class Game {
     }
 
 
-
+    //The method turns the card upside down or downside up.
     void turnCard(Card card) {
-
-        computerMemory.putIfAbsent(card.getID(), card); //save the turned card into the memory of the computer
+    	
+    	//This command saves the turned card into the HashMap computerMemory
+        computerMemory.putIfAbsent(card.getID(), card);
+        //This is to check if the player is allowed to turn a card.
         if ((timerrunning && isPlayer1) || card.getIcon() != null)
-            return; //check whether we are eligible to turn a card
+            return;
         card.turnCard();
 
-        // We execute a card action instantly if no cards have been turned yet in a turn. After that we wait a small amount so that the player can see whether the second card is a match
+        /*The card action is executed instantly if no cards have been turned yet in a turn. 
+         *Then, there is a small waiting period to check if it is a match or not.
+         */
         if (cardsToCompare.size() == 1) {
             int delay = 500;
             Timer timer = new Timer(delay, ex -> {
                 timerrunning = false;
                 actionHandler(card);
             });
-            timer.setRepeats(false);//make sure the timer only runs once
+            //To make sure the timer will only run once.
+            timer.setRepeats(false);
             timerrunning = true;
             timer.start();
         } else actionHandler(card);
     }
 
-    //Check what action should be executed depending on the id of the card
+    //ActionHandler checks whether the action should be executed using the id of the card
     private void actionHandler(Card card) {
         if (card.getID() == Board.BombID) updateScore(bombDamage);
         else if (card.getID() == Board.shuffleId) createPostShuffleWindow();
@@ -119,38 +124,42 @@ class Game {
         if (isFinished()) endGame();
     }
 
-    //The computer must draw 2 non-special cards in total. This function is responsible for drawing the first card
-    // If a special card is turned this function should start again
+    /*When playing against the computer, 2 non-special cards have to be drawn automatically. 
+     *This function is responsible for drawing the first card. 
+     *If a special card is turned this function will start again.
+    */
     private void computerTurnFirstNormalCard() {
         Card card = getRandomCard();
         turnCard(card);
 
-        //The turned card is special, we will restart this function after a small delay
+        //If the turned card is special, the function will restart after a small delay.
         if (card.getID() == Board.BombID || card.getID() == Board.shuffleId) {
-            Timer newTimer = new Timer(500, ex2 -> computerTurnFirstNormalCard()); //wait a small amount before starting again
+        	//The timer makes sure there is a waiting period before starting again???
+            Timer newTimer = new Timer(500, ex2 -> computerTurnFirstNormalCard());
             newTimer.setRepeats(false);//make sure the timer only runs once
             newTimer.start();
             return;
         }
 
-        //The turned card is a normal one, wait a bit
+        //If the turned card is normal, there is a waiting period
         Timer timer = new Timer(1000, ex -> {
-            //The computer does not know where the other card is, it will turn a random one again
+            //If the computer does not know where the other card is it will turn a random card, executing this code.
             if (computerMemory.get(card.getID()) == null || (computerMemory.get(card.getID()) == card))
                 computerTurnSecondNormalCard();
             else {
-                //The computer knows where the other card is
+                //The computer knows where the other card is (depends on the difficulty level), this part of code will be executed.
                 Random random = new Random();
                 double r = random.nextDouble();
 
                 //Depending on the selected difficulty the computer has a chance that it will ignore the fact that it knows the matching card
                 //When put on easy the computer has a 66% chance of ignoring this. 33% on Medium and 0% on Hard
                 if (r < chanceMap.get(difficulty)) turnCard(computerMemory.get(card.getID()));
-                else computerTurnSecondNormalCard(); //TODO merge with first if?
+                else computerTurnSecondNormalCard();
             }
         });
-
-        timer.setRepeats(false);//make sure the timer only runs once
+        
+        //This command makes sure the timer only runs once.
+        timer.setRepeats(false);
         timer.start();
     }
 
@@ -172,11 +181,13 @@ class Game {
     private Card getRandomCard() {
         Random randomGenerator = new Random();
         int index = randomGenerator.nextInt(cards.size());
+        // this command makes sure to keep choosing a random card until finding a card that has not been turned yet.
         while (cards.get(index).getIcon() != null)
-            index = randomGenerator.nextInt(cards.size()); //keep choosing a random card until we find a card that has not been turned yet
+            index = randomGenerator.nextInt(cards.size());
         return cards.get(index);
     }
-
+    
+    //This method checks if the two turned cards are a match via the getter method of ID and thus equal.
     private void isMatch(Card card1, Card card2) {
         cardsToCompare.clear();
         if (card1.getID() == card2.getID()) {
@@ -184,41 +195,50 @@ class Game {
             if (!isPlayer1 && !isFinished()) computerTurnFirstNormalCard();
         } else endTurn(card1, card2);
     }
-
+    
+    //At the end of each turn this method updates the score of the appropriate player if the two cards are a match.
     private void updateScore(int amount) {
         if (isPlayer1) scorePlayer1 += amount;
         else scorePlayer2 += amount;
         scorePlayer1Label.setText("Player P1: " + scorePlayer1);
         scorePlayer2Label.setText("Player P2: " + scorePlayer2);
     }
-
+    
+    //Method endTurn turns the cards that are not a match and switches from player via switchPlayer method.
     private void endTurn(Card card1, Card card2) {
         card1.turnCard();
         card2.turnCard();
         switchPlayer();
         if (!isPlayer1 && this.mode == Mode.COMPUTER) computerTurnFirstNormalCard();
     }
-
+    
+    //This method simply switches to the opposite player.
     private void switchPlayer() {
         isPlayer1 = !isPlayer1;
         playerTurn.setText(isPlayer1 ? "Player 1's Turn" : "Player 2's Turn");
     }
 
+    //This private method checks if all cards are turned and the game is thus finished or if the other player still has to play.
     private boolean isFinished() {
         for (Card card : cards)
             if (card.getIcon() == null) return false;
         return true;
     }
-
+    
+    //Method endGame creates an object of class GameOver.
     private void endGame() {
         new GameOver(scorePlayer1, scorePlayer2);
         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         postShuffleWindow.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
     }
-
+    
+    /*This method shuffles the cards which are not found yet, because the special card 'Cards' has been activated. 
+     *First, the memory of the computer has been reset as the cards will now be in another order.
+     *Secondly, the previous play window is closed, a new window is opened (same size) and the closed cards are shuffled.
+     */
     private void createPostShuffleWindow() {
-        computerMemory = new HashMap<>(); //reset the memory of the computer
-        window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING)); //Close the previous window
+        computerMemory = new HashMap<>();
+        window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
         this.postShuffleWindow = new JFrame("Post-Shuffle");
         postShuffleWindow.setSize(windowWidth, windowHeight);
         JPanel mainPanel = new JPanel();
@@ -229,7 +249,8 @@ class Game {
         postShuffleWindow.add(scorePanel, BorderLayout.NORTH);
         postShuffleWindow.setVisible(true);
     }
-
+    
+    //??? Chances the computer gets it right??? DAMIAN
     private void fillChanceMap() {
         int i = 1;
         for (Difficulty difficulty : Difficulty.values()) chanceMap.put(difficulty, i++ * 0.33);
